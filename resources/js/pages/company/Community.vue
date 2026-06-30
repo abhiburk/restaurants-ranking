@@ -11,7 +11,7 @@ import { Building, ChartLine, CheckCircleIcon } from 'lucide-vue-next';
 import UndrawAgreement from '@/components/svg/UndrawAgreement.vue';
 import UndrawAddPost from '@/components/svg/UndrawAddPost.vue';
 import UndrawApprove from '@/components/svg/UndrawApprove.vue';
-import CommunityController from '@/actions/App/Http/Controllers/CommunityController';
+import ContributorController from '@/actions/App/Http/Controllers/ContributorController';
 
 const page = usePage();
 const appName = computed(() => page.props.name);
@@ -51,7 +51,7 @@ const appName = computed(() => page.props.name);
                                 </p>
                                 <div class="flex flex-wrap gap-4 ">
                                     <Button size="lg" as-child>
-                                        <Link :href="CommunityController.create()">Join the community</Link>
+                                        <Link :href="ContributorController.create()">Join the community</Link>
                                     </Button>
                                 </div>
                             </div>

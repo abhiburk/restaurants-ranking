@@ -23,7 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import CommunityController from '@/actions/App/Http/Controllers/CommunityController';
+import ContributorController from '@/actions/App/Http/Controllers/ContributorController';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -46,7 +46,7 @@ function handleSuccess() {
             :options="{ preserveScroll: true }" 
             reset-on-success
             @success="handleSuccess"
-            :action="CommunityController.store()">
+            :action="ContributorController.store()">
             <Card class="w-full max-w-xl">
                 <CardHeader class="flex items-start gap-4">
                     <UserIcon class="h-15 w-15" />

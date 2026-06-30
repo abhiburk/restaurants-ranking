@@ -2,7 +2,10 @@
 import { ArrowDown, ArrowUp } from 'lucide-vue-next';
 
 defineProps({
-    growth_percentage: Number,
+    growth_percentage: {
+        type: Number,
+        default: 0
+    },
     class: String
 });
 

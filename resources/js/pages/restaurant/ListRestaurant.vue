@@ -68,14 +68,9 @@ const filters = computed(() => page.props.filters);
 
                 <!-- Search -->
                 <div class="my-6">
-                    <InputGroup class="w-full py-5 rounded-2xl border bg-card text-card-foreground">
-                        <SearchInput :route="RestaurantController.index(city.slug).url" v-model="filters.search"
+                    <SearchInput :route="RestaurantController.index(city.slug).url" v-model="filters.search"
                             :extra-params="{ ...filters }" class="w-full text-sm outline-none "
                             placeholder="Search restaurants" />
-                        <InputGroupAddon>
-                            <SearchIcon />
-                        </InputGroupAddon>
-                    </InputGroup>
                 </div>
 
                 <div class="fade-4 space-y-2.5">

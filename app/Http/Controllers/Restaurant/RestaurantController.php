@@ -52,7 +52,7 @@ class RestaurantController extends Controller
                 });
             })
             ->withGrowthPercentage() // Eager load growth_percentage scope
-            ->with(['category:id,name,slug'])
+            ->with(['category:id,name,slug', 'city:id,name,slug'])
             ->orderByDesc('votes_today')
             ->paginate($perPage)
             ->onEachSide(1)

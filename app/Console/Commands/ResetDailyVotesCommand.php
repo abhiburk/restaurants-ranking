@@ -115,6 +115,14 @@ class ResetDailyVotesCommand extends Command
 
         VoteArchive::insert($rows->toArray());
 
+        /*
+        |--------------------------------------------------------------------------
+        | Delete votes for that day
+        |--------------------------------------------------------------------------
+        */
+
+        Vote::where('voted_at', $date)->delete();
+
         $this->line("Archived {$date} ({$rows->count()} restaurants)");
     }
 }

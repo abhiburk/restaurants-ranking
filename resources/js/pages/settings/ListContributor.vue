@@ -48,7 +48,7 @@ defineProps({
                             Help discover restaurants in your city and become one of founding contributors.
                         </p>
                         <Button class="mt-6" as-child>
-                            <Link :href="CommunityController.create()" target="_blank">Join Now</Link>
+                            <Link :href="ContributorController.create()" target="_blank">Join Now</Link>
                         </Button>
                     </CardContent>
                 </Card>

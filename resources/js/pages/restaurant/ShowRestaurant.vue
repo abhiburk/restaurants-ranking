@@ -3,6 +3,7 @@ import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import {
     CheckCircleIcon,
     EyeIcon,
+    Flag,
     TrendingDown,
     TrendingUp,
 } from 'lucide-vue-next';
@@ -519,29 +520,14 @@ const getUserLocation = () => {
             <section v-if="!restaurant.user_id && can(permissions.create_restaurant_claims)">
                 <Card>
                     <CardHeader>
-                        <CardTitle>
-                            Claim Restaurant
+                        <CardTitle class="flex items-center gap-2">
+                            <Flag class="h-4 w-4" /> Claim Restaurant 
                         </CardTitle>
                         <CardDescription>
                             Claiming is quick and easy. We verify ownership to ensure only legitimate
                             representatives can claim. No credit card required.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <div class="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">Dashboard
-                                Access</div>
-                            <div class="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">Vote
-                                Analytics</div>
-                            <div class="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">Photo Gallery
-                            </div>
-                            <div class="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">Response to
-                                Votes</div>
-                        </div>
-                        <CardDescription>
-                            Account Required!
-                        </CardDescription class="mt-4">
-                    </CardContent>
                     <CardFooter>
                         <Button as-child class="w-full">
                             <Link :href="RestaurantController.createClaim(restaurant.slug)">Get Started</Link>

@@ -157,7 +157,7 @@ class VoteSeeder extends Seeder
                     'is_vpn' => $isVpn,
                     'is_flagged' => $isFlagged,
                     'flag_reason' => $isFlagged ? 'vpn_detected' : null,
-                    'deleted_at' => $isFlagged ? now() : null,
+                    // 'deleted_at' => $isFlagged ? now() : null,
                     'created_at' => $createdAt,
                     'updated_at' => $createdAt,
                 ];

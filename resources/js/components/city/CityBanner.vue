@@ -20,6 +20,7 @@ import { Spinner } from '../ui/spinner';
 import { Form } from '@inertiajs/vue3';
 import CityController from '@/actions/App/Http/Controllers/CityController';
 import { ArrowUpRightIcon } from 'lucide-vue-next';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 const [isOpen, closeDialog] = useDialog();
 
 defineProps({
@@ -154,7 +155,22 @@ defineProps({
 
                             <!-- Waitlist Row -->
                             <div class="text-left" v-if="waitlistCount > 0">
-                                <div>
+                                <div class="flex items-center gap-2">
+                                    <div
+                                        class="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
+                                        <Avatar>
+                                            <AvatarImage src="https://i.pravatar.cc/150?img=13" alt="@shadcn" />
+                                            <AvatarFallback>CN</AvatarFallback>
+                                        </Avatar>
+                                        <Avatar>
+                                            <AvatarImage src="https://i.pravatar.cc/150?img=24" alt="@leerob" />
+                                            <AvatarFallback>LR</AvatarFallback>
+                                        </Avatar>
+                                        <Avatar>
+                                            <AvatarImage src="https://i.pravatar.cc/150?img=33" alt="@evilrabbit" />
+                                            <AvatarFallback>ER</AvatarFallback>
+                                        </Avatar>
+                                    </div>
                                     <p class="text-xs text-gray-500">
                                         <strong>
                                             {{ waitlistCount == 1 ? waitlistCount.toLocaleString() + ' person' :

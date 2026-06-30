@@ -3,7 +3,9 @@ import { Input } from '@/components/ui/input';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash-es';
 import { ref, watch } from 'vue';
-import { InputGroupInput } from './ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
+import { SearchIcon } from '@lucide/vue';
+import { CircleX } from 'lucide-vue-next';
 
 type SearchParams = Record<string, any>;
 
@@ -57,5 +59,13 @@ watch(value, (val) => {
 </script>
 
 <template>
-    <InputGroupInput v-model="value" :placeholder="placeholder" class="max-w-sm" :class="class" />
+    <InputGroup class="w-full py-6 rounded-2xl border bg-card text-card-foreground">
+        <InputGroupInput v-model="value" :placeholder="placeholder" :class="class" />
+        <InputGroupAddon>
+            <SearchIcon />
+        </InputGroupAddon>
+        <InputGroupAddon align="inline-end">
+            <CircleX v-on:click="() => value = ''" class="cursor-pointer" />
+        </InputGroupAddon>
+    </InputGroup>
 </template>

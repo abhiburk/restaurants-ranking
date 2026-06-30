@@ -26,8 +26,8 @@ const props = defineProps({
 });
 
 const open = ref(false);
-const restaurantUrl = RestaurantController.show([props.restaurant.city.slug, props.restaurant.slug]).url;
-
+// const restaurantUrl = RestaurantController.show([props.restaurant.city.slug, props.restaurant.slug]).url;
+const restaurantUrl = window.location.href;
 const shareUrl = computed(() => restaurantUrl);
 const shareText = computed(() => {
     return (
@@ -125,11 +125,11 @@ const shareViaEmail = () => {
                 </Button>
             </div>
 
-            <DialogFooter class="sm:justify-start">
+            <!-- <DialogFooter class="sm:justify-start">
                 <DialogClose as-child>
                     <Button type="button" variant="secondary">Close</Button>
                 </DialogClose>
-            </DialogFooter>
+            </DialogFooter> -->
         </DialogContent>
     </Dialog>
 </template>

@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vote extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids;
     
     protected $guarded = ['id'];
 
@@ -28,9 +27,8 @@ class Vote extends Model
 
     public function scopeToday($query)
     {
-        return $query->whereBetween(
-            'voted_at',
-            [now()->startOfDay(), now()->endOfDay()]
-        );
+        return $query
+        ->where('voted_at', '>=', now()->startOfDay())
+        ->where('voted_at', '<', now()->endOfDay());
     }
 }

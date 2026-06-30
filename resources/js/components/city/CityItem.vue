@@ -8,20 +8,30 @@ import {
     ItemMedia,
     ItemTitle,
 } from '@/components/ui/item';
-import { Link } from '@inertiajs/vue3';
+import { Deferred, Link } from '@inertiajs/vue3';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '../ui/empty';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import VotesToday from '../restaurant/VotesToday.vue';
 import TodaysGrowthPercentage from '../custom/TodaysGrowthPercentage.vue';
+import { Skeleton } from '../ui/skeleton';
+import Pagination from '@/components/table/Pagination.vue';
 
 defineProps({
-    cities: Object,
+    cities: Array,
+    paginate: {
+        type: Boolean,
+        default: false
+    }
 });
 
 </script>
 
 <template>
-    <div>
+    <Deferred data="activeCities">
+        <template #fallback>
+            <div class="flex flex-wrap gap-4">
+                <Skeleton v-for="i in 5" class="w-full h-22" />
+            </div>
+        </template>
         <ItemGroup class="gap-4">
             <Item v-for="city in cities.data" :key="city.id" variant="outline" as-child
                 class="rounded-2xl bg-card text-card-foreground">
@@ -42,25 +52,26 @@ defineProps({
                     </ItemContent>
                     <ItemContent class="flex-none text-center">
                         <!-- <ItemDescription> -->
-                            <div class="shrink-0 text-right">
-                                <p class="font-display text-md font-semibold tabular-nums">
-                                    {{ city.votes_today.toLocaleString() }} 
-                                </p>
-                                <p class="text-xs text-muted-foreground">votes today</p>
-                                <TodaysGrowthPercentage :growth_percentage="city.growth_percentage" class="text-xs"/>
-                            </div>
+                        <div class="shrink-0 text-right">
+                            <p class="font-display text-md font-semibold tabular-nums">
+                                {{ city?.votes_today?.toLocaleString() ?? 0 }}
+                            </p>
+                            <p class="text-xs text-muted-foreground">votes today</p>
+                            <TodaysGrowthPercentage :growth_percentage="city.growth_percentage" class="text-xs" />
+                        </div>
                         <!-- </ItemDescription> -->
                     </ItemContent>
                 </Link>
             </Item>
-            <Empty v-if="!cities.data?.length">
+            <Empty v-if="!cities.data.length">
                 <EmptyHeader>
                     <EmptyTitle>No cities found</EmptyTitle>
                     <EmptyDescription>
                         We couldn't find any cities matching your search.
                     </EmptyDescription>
                 </EmptyHeader>
-            </Empty>
+            </Empty> 
         </ItemGroup>
-    </div>
+        <Pagination :links="cities?.links" v-if="paginate" />
+    </Deferred>
 </template>

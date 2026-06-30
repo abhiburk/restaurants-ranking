@@ -7,6 +7,7 @@ use App\Models\Vote;
 use App\Services\CityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CityController extends Controller
 {
@@ -16,17 +17,18 @@ class CityController extends Controller
         $perPage = (int) $request->input('per_page', 5);
         
         // Cache because this section changes rarely
-        $comingSoonCities = cache()->remember(
+        $comingSoonCities = Inertia::defer(fn() => cache()->remember(
             'coming-soon-cities',
             now()->addHours(12),
             fn () => City::comingSoon()->select(['name', 'slug'])->limit(5)->get(['name', 'slug'])->toArray()
+            )
         );
 
-        $cities = (new CityService())->listCities($search, $perPage);
-
+        $cities = Inertia::defer(fn() => (new CityService)->listCities($search, $perPage));
+        
         return inertia('ListCities', [
             'filters' => $request->only('search', 'per_page'),
-            'cities' => $cities,
+            'activeCities' => $cities,
             'comingSoonCities' => $comingSoonCities,
         ]);
     }

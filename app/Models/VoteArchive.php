@@ -11,6 +11,7 @@ class VoteArchive extends Model
 
     protected $guarded = ['id'];
 
+
     public function restaurant()
     {
         return $this->belongsTo(Restaurant::class);
@@ -23,12 +24,8 @@ class VoteArchive extends Model
 
     public function scopeYesterday($query)
     {
-        return $query->whereBetween(
-            'archived_at',
-            [
-                now()->subDay()->startOfDay(),
-                now()->subDay()->endOfDay(),
-            ]
-        );
+        return $query
+        ->where('archived_at', '>=', now()->subDay()->startOfDay())
+        ->where('archived_at', '<', now()->startOfDay());
     }
 }

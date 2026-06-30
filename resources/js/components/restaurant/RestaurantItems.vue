@@ -30,7 +30,7 @@ defineProps({
         <ItemGroup class="gap-4">
             <Item v-for="restaurant in restaurants.data" :key="restaurant.id" variant="outline" as-child
                 class="rounded-2xl bg-card text-card-foreground">
-                <Link :href="RestaurantController.show([citySlug, restaurant.slug])
+                <Link :href="RestaurantController.show([restaurant.city.slug, restaurant.slug])
                     ">
                     <!-- <RestaurantAvatar :restaurant="restaurant" /> -->
                     <Avatar class="size-12">
@@ -65,9 +65,13 @@ defineProps({
 
             <Empty v-if="!restaurants.data?.length">
                 <EmptyHeader>
+                     <div class="text-5xl">
+        🍽️
+    </div>
                     <EmptyTitle>No restaurants found</EmptyTitle>
                     <EmptyDescription>
-                        We couldn't find any restaurants matching your search.
+                        We couldn't find any restaurants matching your search. 
+                        Try another keyword or browse nearby restaurants.
                     </EmptyDescription>
                 </EmptyHeader>
             </Empty>

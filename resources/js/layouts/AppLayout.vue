@@ -18,6 +18,11 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
+
+        <!-- Full Width Hero -->
+         <!-- <div class="mx-auto flex w-full flex-col px-4 py-4 md:max-w-6xl">
+             <slot name="hero" />
+         </div> -->
         <!-- min-h-screen -->
         <div class="mx-auto flex  w-full flex-col px-4 py-4 md:max-w-6xl xl:flex-row">
             <!-- Main Content -->

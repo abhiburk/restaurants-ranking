@@ -32,16 +32,18 @@ return new class extends Migration
             $table->decimal('latitude', 10, 8)->nullable();
             $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamps();
-            $table->softDeletes();
-            
-            // Hard dedup stops
+            // $table->softDeletes();
+
+            // // Hard dedup stops
             $table->unique(['visitor_id', 'restaurant_id', 'voted_at']);
             $table->unique(['user_id', 'restaurant_id', 'voted_at']);
 
             // Query performance
-            $table->index(['restaurant_id', 'voted_at', 'deleted_at']);
+            $table->index(['restaurant_id', 'voted_at']);
             $table->index(['ip_hash', 'restaurant_id', 'voted_at']);
             $table->index(['created_at', 'restaurant_id']);
+            $table->index('city_id');
+            $table->index('restaurant_id');
         });
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -66,11 +67,11 @@ class City extends Model
     public function getBannerUrlAttribute($value)
     {
         if ($this->banner) {
-            return asset('storage/'.$this->banner);
+            return asset('storage/' . $this->banner);
         }
-        
+
         return "https://picsum.photos/600/300";
-        
+
         return "https://placehold.co/1200x500/e2e8f0/475569?text={$this->name}";
 
         return asset('storage/misc/default-city.png');
@@ -91,26 +92,24 @@ class City extends Model
         return $this->hasMany(VoteArchive::class, 'city_id');
     }
 
-    public function scopeWithVotesToday($query)
+    public function scopeWithVotesToday(Builder $query): Builder
     {
         $votesTodaySub = Vote::query()
-            ->select('city_id', DB::raw('COUNT(*) as votes_today'))
             ->today()
+            ->selectRaw('city_id, COUNT(city_id) AS votes_today')
             ->groupBy('city_id');
 
         return $query
             ->leftJoinSub($votesTodaySub, 'votes_today', function ($join) {
                 $join->on('votes_today.city_id', '=', 'cities.id');
             })
-            ->addSelect(
-                DB::raw('IFNULL(votes_today.votes_today, 0) as votes_today')
-            );
+            ->addSelect(DB::raw('COALESCE(votes_today.votes_today, 0) AS votes_today'));
     }
 
-    public function scopeWithVotesYesterday($query)
+    public function scopeWithVotesYesterday(Builder $query): Builder
     {
         $votesYesterdaySub = VoteArchive::query()
-            ->select('city_id', DB::raw('SUM(votes) as votes_yesterday'))
+            ->selectRaw('city_id, SUM(votes) AS votes_yesterday')
             ->yesterday()
             ->groupBy('city_id');
 
@@ -118,32 +117,28 @@ class City extends Model
             ->leftJoinSub($votesYesterdaySub, 'votes_yesterday', function ($join) {
                 $join->on('votes_yesterday.city_id', '=', 'cities.id');
             })
-            ->addSelect(
-                DB::raw('IFNULL(votes_yesterday.votes_yesterday, 0) as votes_yesterday')
-            );
+            ->addSelect(DB::raw('COALESCE(votes_yesterday.votes_yesterday, 0) AS votes_yesterday'));
     }
 
-    public function scopeWithGrowthPercentage($query)
+    public function scopeWithGrowthPercentage(Builder $query): Builder
     {
         return $query
             ->withVotesToday()
             ->withVotesYesterday()
-            ->addSelect([
-                DB::raw('
+            ->selectRaw("
                 CASE
-                    WHEN IFNULL(votes_yesterday.votes_yesterday, 0) = 0
-                    THEN 100
+                    WHEN COALESCE(votes_yesterday.votes_yesterday, 0) = 0
+                        THEN 100
                     ELSE ROUND(
                         (
                             (
-                                IFNULL(votes_today.votes_today, 0)
+                                COALESCE(votes_today.votes_today, 0)
                                 - votes_yesterday.votes_yesterday
                             ) / votes_yesterday.votes_yesterday
                         ) * 100
                     )
-                END as growth_percentage
-            '),
-            ]);
+                END AS growth_percentage
+            ");
     }
 
     public function growth_percentage()

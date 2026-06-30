@@ -59,6 +59,7 @@ Route::get('/privacy-policy', [DiscoverController::class, 'privacyPolicy'])->nam
 Route::get('/terms-of-service', [DiscoverController::class, 'termsOfService'])->name('discover.terms-of-service');
 Route::get('/contact-us', [DiscoverController::class, 'contactUs'])->name('discover.contact-us');
 Route::get('/community', [DiscoverController::class, 'community'])->name('discover.community');
+Route::get('explore', [DiscoverController::class, 'explore'])->name('discover.explore');
 
 Route::get('/cities', [CityController::class, 'index'])->name('city.index');
 Route::get('/coming-soon-cities', [CityController::class, 'comingSoonCities'])->name('city.coming-soon-cities');
@@ -68,7 +69,9 @@ Route::post('/{city:slug}/wishlist', [CityController::class, 'storeWishlist'])->
 Route::get('/{city:slug}/restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
 Route::get('/{city:slug}/{restaurant:slug}', [RestaurantController::class, 'show'])->name('restaurants.show');
 Route::get('/{city:slug}/{restaurant:slug}/photos', [RestaurantController::class, 'photos'])->name('restaurants.photos');
-Route::post('/{city:slug}/{restaurant:slug}/vote', [VoteController::class, 'store'])->name('restaurants.vote');
+
+// Allow 1 request per 24 hours per IP address
+Route::post('/{city:slug}/{restaurant:slug}/vote', [VoteController::class, 'store'])->name('restaurants.vote')->middleware('throttle:1,1,200');
 
 Route::get('/qr/{qrCode}', [RestaurantController::class, 'showWithQr'])->name('restaurants.qr.show');
 Route::get('/restaurant/{restaurant}/qr/download', [RestaurantController::class, 'download'])->name('restaurants.qr.download');

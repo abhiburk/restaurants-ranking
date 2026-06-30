@@ -48,38 +48,14 @@ const filters = computed(() => page.props.filters);
 
             <!-- Search -->
             <div class="mt-6">
-                <InputGroup class="w-full border-secondary bg-card text-card-foreground py-5 rounded-2xl border">
-                    <SearchInput :route="CityController.comingSoonCities().url" v-model="filters.search"
-                        class="w-full text-sm outline-none " placeholder="Search cities" />
-                    <InputGroupAddon>
-                        <SearchIcon />
-                    </InputGroupAddon>
-                </InputGroup>
+                <SearchInput :route="CityController.comingSoonCities().url" v-model="filters.search" class="w-full text-sm outline-none " placeholder="Search cities" />
             </div>
 
             <div class="mt-6 flex flex-wrap gap-3">
-                <Link v-for="city in comingSoonCities" :key="city.id" :href="RestaurantController.index(city.slug)"
+                <div v-for="city in comingSoonCities" :key="city.id" :href="RestaurantController.index(city.slug)"
                     class="group w-full overflow-hidden rounded-2xl border border-border bg-card text-left transition-all hover:shadow-sm">
                     <CityBanner :city="city" />
-
-                    <div class="p-4">
-                        <p class="text-sm leading-relaxed text-muted-foreground">
-                            We’re launching in {{ city.name }} soon. Join the waitlist to be the first to know when we
-                            go live.
-                        </p>
-                        <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
-                            <div class="flex items-center gap-2 rounded-full bg-secondary px-3 py-2">
-                                <div class="h-2 w-2 rounded-full bg-amber-500"></div>
-                                <span class="text-xs font-semibold text-secondary-foreground">
-                                    {{ city.city_wishlists_count }} interested
-                                </span>
-                            </div>
-                            <Button size="sm">
-                                Notify Me
-                            </Button>
-                        </div>
-                    </div>
-                </Link>
+                </div>
 
                 <Empty v-if="!comingSoonCities.length">
                     <EmptyHeader>

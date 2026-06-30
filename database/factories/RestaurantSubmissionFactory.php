@@ -31,7 +31,7 @@ class RestaurantSubmissionFactory extends Factory
         return [
             'name' => $name,
             // 'slug' => $slug,
-            'user_id' => $contributor->user->id,
+            'user_id' => $contributor->user?->id,
             'contributor_id' => $contributor->id,
             'description' => $this->faker->paragraphs(3, true),
             'address' => $this->faker->streetAddress(),
