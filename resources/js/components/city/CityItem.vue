@@ -72,6 +72,6 @@ defineProps({
                 </EmptyHeader>
             </Empty> 
         </ItemGroup>
-        <Pagination :links="cities?.links" v-if="paginate" />
+        <Pagination :links="cities?.links" v-if="paginate" :only="['activeCities']" />
     </Deferred>
 </template>

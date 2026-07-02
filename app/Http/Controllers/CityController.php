@@ -15,17 +15,19 @@ class CityController extends Controller
     {
         $search = trim($request->input('search', ''));
         $perPage = (int) $request->input('per_page', 5);
-        
+
         // Cache because this section changes rarely
-        $comingSoonCities = Inertia::defer(fn() => cache()->remember(
-            'coming-soon-cities',
-            now()->addHours(12),
-            fn () => City::comingSoon()->select(['name', 'slug'])->limit(5)->get(['name', 'slug'])->toArray()
+        $comingSoonCities = Inertia::defer(
+            fn() =>
+            cache()->remember(
+                'coming-soon-cities',
+                now()->addHours(12),
+                fn() => City::comingSoon()->select(['name', 'slug'])->limit(5)->get(['name', 'slug'])->toArray()
             )
         );
 
         $cities = Inertia::defer(fn() => (new CityService)->listCities($search, $perPage));
-        
+
         return inertia('ListCities', [
             'filters' => $request->only('search', 'per_page'),
             'activeCities' => $cities,
@@ -36,7 +38,8 @@ class CityController extends Controller
     public function comingSoonCities(Request $request)
     {
         $search = $request->input('search');
-        $comingSoonCities = City::comingSoon()
+        $comingSoonCities = Inertia::defer(function() use($search){
+            return City::comingSoon()
             ->with(['state:id,name,slug'])
             ->where(function ($q) use ($search) {
                 if ($search) {
@@ -47,9 +50,10 @@ class CityController extends Controller
                 }
             })
             ->withCount('city_wishlists')->limit(5)->get();
+        });
 
         return inertia('ListComingSoonCities', [
-            'comingSoonCities' => collect($comingSoonCities),
+            'comingSoonCities' => $comingSoonCities,
             'filters' => $request->only('search'),
         ]);
     }

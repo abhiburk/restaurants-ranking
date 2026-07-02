@@ -18,17 +18,19 @@ const appName = computed(() => page.props.name);
 </script>
 
 <template>
+
     <Head :title="`Discover · ${appName}`" />
     <AppLayout>
         <div class="fade-3 grid gap-4">
             <SearchInput :route="CityController.index().url" v-model="filters.search"
-                class="w-full text-sm outline-none " placeholder="Search cities" />
+                class="w-full text-sm outline-none " placeholder="Search cities" :options="{ only: ['activeCities'] }" />
             <CityItem :cities="activeCities" paginate="true" />
         </div>
 
         <template #sidebar>
             <!-- COMING SOON CITIES -->
-            <CitiesPills :cities="comingSoonCities" title="Coming Soon" :url="CityController.comingSoonCities()" />
+            <CitiesPills :cities="comingSoonCities" title="Coming Soon" :url="CityController.comingSoonCities()"
+                :deferred-data="['comingSoonCities']" />
         </template>
     </AppLayout>
 </template>

@@ -28,13 +28,13 @@ const appName = computed(() => page.props.name);
     <AppLayout>
         <div class="fade-3 grid gap-4">
             <div>
-                <SearchInput :route="DiscoverController.explore().url" v-model="filters.search" :extra-params="{ ...filters }" placeholder="Search restaurants" />
+                <SearchInput :route="DiscoverController.explore().url" v-model="filters.search"
+                    :extra-params="{ ...filters }" placeholder="Search restaurants"
+                    :options="{ only: ['restaurants', 'filters'] }" />
             </div>
 
             <div class="fade-4 space-y-2.5">
                 <RestaurantItems :restaurants="restaurants" />
-
-                <Pagination :links="restaurants.links" />
             </div>
         </div>
         <template #sidebar>

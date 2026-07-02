@@ -17,10 +17,11 @@ import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import InputError from '../InputError.vue';
 import { Spinner } from '../ui/spinner';
-import { Form } from '@inertiajs/vue3';
+import { Deferred, Form } from '@inertiajs/vue3';
 import CityController from '@/actions/App/Http/Controllers/CityController';
 import { ArrowUpRightIcon } from 'lucide-vue-next';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Skeleton } from '../ui/skeleton';
 const [isOpen, closeDialog] = useDialog();
 
 defineProps({
@@ -91,7 +92,8 @@ defineProps({
                             </span>
                         </div>
                         <p class="text-sm leading-relaxed text-gray-500 ">
-                            Make your voice heard! Join the waitlist to help us prioritize launching in {{ city.name }}.
+                            Make your voice heard! Join the waitlist to help us prioritize launching in {{ city.name
+                            }}.
                         </p>
 
                         <!-- Footer -->

@@ -10,6 +10,7 @@ import {
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps<{
+    only?: string[];
     links: {
         url: string | null;
         label: string;
@@ -24,6 +25,7 @@ function go(url: string | null) {
         preserveScroll: true,
         preserveState: true,
         replace: true,
+        only: props.only ?? null,
     });
 }
 
@@ -34,7 +36,7 @@ function isEllipsis(label: string) {
 
 <template>
     <div class="flex flex-col gap-6">
-        <Pagination v-if="links.length > 3">
+        <Pagination v-if="links?.length > 3">
             <PaginationContent>
                 <!-- Previous -->
                 <PaginationPrevious

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Building, Folder, Home, LayoutGrid, Menu, Search } from 'lucide-vue-next';
+import { BookOpen, Building, Compass, Folder, Home, LayoutGrid, Menu, Search } from 'lucide-vue-next';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -58,8 +58,13 @@ const activeItemStyles =
 const mainNavItems: NavItem[] = [
     {
         title: 'Home',
-        href: DiscoverController.index(),
+        href: DiscoverController.home(),
         icon: Home,
+    },
+    {
+        title: 'Discover',
+        href: DiscoverController.index(),
+        icon: Compass,
     },
     {
         title: 'Cities',

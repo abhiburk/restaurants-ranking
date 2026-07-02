@@ -13,17 +13,34 @@ defineProps<Props>();
 </script>
 
 <template>
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 40 42"
-        :class="className"
-        v-bind="$attrs"
-    >
-        <path
-            fill="currentColor"
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633ZM38 18.301l-5.6 3.11v-6.157l5.6-3.11V18.3Zm-1.06-7.856-5.54 3.078-5.54-3.079 5.54-3.078 5.54 3.079ZM24.8 18.3v-6.157l5.6 3.111v6.158L24.8 18.3Zm-1 1.732 5.54 3.078-13.14 7.302-5.54-3.078 13.14-7.3v-.002Zm-16.2 7.89 7.6 4.222V38.3L2 30.966V7.92l5.6 3.111v16.892ZM8.6 9.3 3.06 6.222 8.6 3.143l5.54 3.08L8.6 9.3Zm21.8 15.51-13.2 7.334V38.3l13.2-7.334v-6.156ZM9.6 11.034l5.6-3.11v14.6l-5.6 3.11v-14.6Z"
-        />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" :class="className" v-bind="$attrs">
+        <defs>
+            <!-- Food-ranking brand gradient -->
+            <linearGradient id="wootersGradientIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF5A5F" />
+                <stop offset="100%" stop-color="#FF8A00" />
+            </linearGradient>
+        </defs>
+
+        <!-- Transparent Canvas -->
+        <rect width="100%" height="100%" fill="none" />
+
+        <!-- Compact Logo Icon Only -->
+        <g transform="translate(3, 0)">
+            <!-- Shield / Plate Rating Base -->
+            <path d="M22,2 C34,2 44,12 44,24 C44,38 22,50 22,50 C22,50 0,38 0,24 C0,12 10,2 22,2 Z"
+                fill="url(#wootersGradientIcon)" />
+
+            <!-- Minimalist Spoon Cutout -->
+            <path
+                d="M22,10 C25,10 27,12 27,15 C27,18.5 24,22 23.5,25 L23.5,36 C23.5,37 22.8,37.5 22,37.5 C21.2,37.5 20.5,37 20.5,36 L20.5,25 C20,22 17,18.5 17,15 C17,12 19,10 22,10 Z"
+                fill="#FFFFFF" />
+
+            <!-- Embedded Rating Stars -->
+            <polygon points="12,23 13,25 15,25 13,27 14,29 12,28 10,29 11,27 9,25 11,25" fill="#FFFFFF" opacity="0.9" />
+            <polygon points="32,23 33,25 35,25 33,27 34,29 32,28 30,29 31,27 29,25 31,25" fill="#FFFFFF"
+                opacity="0.9" />
+        </g>
     </svg>
+
 </template>

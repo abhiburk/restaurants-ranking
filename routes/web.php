@@ -50,8 +50,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-Route::get('/', [DiscoverController::class, 'index'])->name('discover.index');
-Route::get('/home', [DiscoverController::class, 'home'])->name('discover.home');
+Route::get('/discover', [DiscoverController::class, 'index'])->name('discover.index');
+Route::get('/', [DiscoverController::class, 'home'])->name('discover.home');
 Route::get('/how-it-works', [DiscoverController::class, 'howItWorks'])->name('discover.how-it-works');
 Route::get('/about', [DiscoverController::class, 'about'])->name('discover.about');
 Route::get('/how-claim-restaurant-works', [DiscoverController::class, 'howClaimRestaurantWorks'])->name('discover.how-claim-restaurant-works');

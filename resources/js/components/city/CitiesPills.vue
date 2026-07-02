@@ -9,19 +9,23 @@ import { Skeleton } from '../ui/skeleton';
 defineProps({
     cities: Array,
     title: String,
-    url: String
+    url: String,
+    deferredData: {
+        type: Array,
+        default: () => ['cities'],
+    },
 });
 </script>
 
 <template>
-    <Deferred data="comingSoonCities">
+    <Deferred :data="deferredData">
         <template #fallback>
-            <div class="flex items-center justify-between">
-                <Skeleton class="w-16 h-4" />
-                <Skeleton class="w-16 h-4" />
+            <div class="flex items-center justify-between gap-2">
+                <Skeleton class="w-16 h-3" />
+                <Skeleton class="w-16 h-3" />
             </div>
             <div class="flex flex-wrap gap-2">
-                <Skeleton v-for="i in 5" class="w-22 h-8 rounded-3xl px-3 py-2" />
+                <Skeleton v-for="i in 5" class="w-22 h-8 rounded-3xl" />
             </div>
         </template>
         <Card class="bg-transparent shadow-none border-0 p-0 gap-2">
@@ -35,15 +39,13 @@ defineProps({
                 </CardTitle>
             </CardHeader>
 
-            <CardContent class="flex  flex-col gap-2 p-0">
-                <div class="fade-5" v-if="cities.length">
-                    <div class="flex flex-wrap gap-2 ">
-                        <Link :href="RestaurantController.index(city.slug)" v-for="city in cities">
-                            <Badge variant="secondary" class="px-3 py-2 hover:bg-muted">
-                                {{ city.name }}
-                            </Badge>
-                        </Link>
-                    </div>
+            <CardContent class="flex flex-col gap-2 p-0">
+                <div class="flex flex-wrap gap-2 " v-if="cities.length">
+                    <Link :href="RestaurantController.index(city.slug)" v-for="city in cities">
+                        <Badge variant="secondary" class="px-3 py-2 hover:bg-muted">
+                            {{ city.name }}
+                        </Badge>
+                    </Link>
                 </div>
             </CardContent>
 

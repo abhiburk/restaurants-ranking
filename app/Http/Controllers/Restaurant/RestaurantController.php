@@ -26,67 +26,38 @@ class RestaurantController extends Controller
         $search = $request->input('search');
         $perPage = (int) $request->input('per_page', 5);
         $category = $request->input('category');
-        $today = now()->toDateString();
+
+        $allTimeVotesToday = Inertia::defer(
+            fn() => Vote::today()->where('city_id', $city->id)->count(),
+            'stats'
+        );
+        $waitListCount = Inertia::defer(
+            fn() => $city->city_wishlists()->count() ?? 0,
+            'stats'
+        );
 
         $city = City::query()->select('cities.*')->whereId($city->id)->withGrowthPercentage()->first();
         $city->load('state:id,name,slug');
         $city->loadCount(['restaurants' => fn($q) => $q->active()]);
 
-        $restaurantCategories = RestaurantCategory::active()->limit(5)->get(['id', 'name', 'slug']);
+        $restaurantCategories = Inertia::defer(
+            fn() => RestaurantCategory::active()->whereHas('restaurants', fn($q) => $q->where('city_id', $city->id)->active())->get(['id', 'name', 'slug'])
+        );
 
-        $allTimeVotesToday = Vote::whereDate('voted_at', $today)->where('city_id', $city->id)->count();
+        $cities = Inertia::defer(
+            fn() =>
+            City::active()->where('id', '!=', $city->id)->inRandomOrder()->limit(5)->get(['id', 'name', 'slug'])
+        );
 
-        $cities = City::active()->where('id', '!=', $city->id)->inRandomOrder()->limit(5)->get(['id', 'name', 'slug']);
-
-        $paginatedRestaurants = Restaurant::select('restaurants.*')
-            ->active()
-            ->when($search, function ($q) use ($search) {
-                $q->whereLike('name', "%{$search}%")->orWhere('address', 'like', "%{$search}%");
-            })
-            ->when($city, function ($q) use ($city) {
-                $q->where('city_id', $city->id);
-            })
-            ->when($category, function ($q) use ($category) {
-                $q->whereHas('category', function ($q) use ($category) {
-                    $q->where('slug', $category);
-                });
-            })
-            ->withGrowthPercentage() // Eager load growth_percentage scope
-            ->with(['category:id,name,slug', 'city:id,name,slug'])
-            ->orderByDesc('votes_today')
-            ->paginate($perPage)
-            ->onEachSide(1)
-            ->withQueryString();
-
-        $restaurants = RestaurantStatsService::forListing(collect($paginatedRestaurants->items()));
-
-        // Merge stats into the paginator's items
-        $paginatedRestaurants->getCollection()->transform(function ($restaurant) use ($restaurants) {
-            $stat = $restaurants->firstWhere('restaurant.id', $restaurant->id);
-
-            return array_merge(
-                $restaurant->toArray(),
-                [
-                    'votes_today' => $stat['votes_today'] ?? 0,
-                    'votes_yesterday' => $stat['votes_yesterday'] ?? 0,
-                    'rank' => $stat['rank'] ?? 0,
-                    'streak' => $stat['streak'] ?? 0,
-                    'rank_movement' => $stat['rank_movement'] ?? 0,
-                    'is_trending' => $stat['is_trending'] ?? false,
-                    'rank_change' => $stat['rank_change'] ?? 0,
-                    'last_two_hours' => $stat['last_two_hours'] ?? 0,
-                    'prev_two_hours' => $stat['prev_two_hours'] ?? 0,
-                ]
-            );
-        });
+        $restaurants = Inertia::defer(fn() => (new RestaurantService)->listRestaurants($search, $perPage, $city, $category), 'restaurants');
 
         return Inertia::render('restaurant/ListRestaurant', [
-            'city' => $city,
             'allTimeVotesToday' => $allTimeVotesToday,
-            'restaurants' => $paginatedRestaurants,
+            'waitlistCount' => $waitListCount,
+            'city' => $city,
+            'restaurants' => $restaurants,
             'filters' => $request->only('search', 'per_page', 'category'),
             'restaurantCategories' => $restaurantCategories,
-            'waitlistCount' => $city->city_wishlists()->count() ?? 0,
             'cities' => $cities,
         ]);
     }
@@ -104,7 +75,25 @@ class RestaurantController extends Controller
         $restaurant->load(['media' => function ($q) {
             $q->limit(5);
         }]);
-        $stats = $restaurant->stats;
+
+        $stats = Inertia::defer(function () use ($restaurant) {
+            $stats = $restaurant->stats;
+            return [
+                'votes_today' => $stats->votesToday(),
+                'votes_yesterday' => $stats->votesYesterday(),
+                'rank' => $stats->rank(),
+                'total_ranked' => $stats->totalRanked(),
+                'rank_change' => $stats->rankChange(),
+                'votes_last_hour' => $stats->votesLastHour(),
+                'hourly_change' => $stats->hourlyChange(),
+                'all_time' => $stats->allTime(),
+                'is_trending' => $stats->isTrendingToday(),
+                'streak' => $stats->currentStreak(),       // 0 = no streak
+                'previous_rank' => $stats->previousRank(),        // null = new entry
+                'rank_movement_label' => $stats->rankMovementLabel(),   // "Up from #3"
+                'chart' => $stats->votingHistoryInDays(),
+            ];
+        }, 'stats');
 
         $voted = null;
         if ($visitorId || $userId) {
@@ -127,28 +116,17 @@ class RestaurantController extends Controller
             fn() => $restaurant->restaurant_views()->create([])
         );
 
-        $nearbyRestaurants = (new RestaurantService())->findNearbyRestaurant($restaurant);
+        $nearbyRestaurants = Inertia::defer(
+            fn() => (new RestaurantService())->findNearbyRestaurant($restaurant),
+            'right-sidebar'
+        );
 
         return Inertia::render('restaurant/ShowRestaurant', [
             'restaurant' => $restaurant,
             'voted' => $voted,
             'vote_source' => $voteSource,
             'nearbyRestaurants' => $nearbyRestaurants,
-            'stats' => [
-                'votes_today' => $stats->votesToday(),
-                'votes_yesterday' => $stats->votesYesterday(),
-                'rank' => $stats->rank(),
-                'total_ranked' => $stats->totalRanked(),
-                'rank_change' => $stats->rankChange(),
-                'votes_last_hour' => $stats->votesLastHour(),
-                'hourly_change' => $stats->hourlyChange(),
-                'all_time' => $stats->allTime(),
-                'is_trending' => $stats->isTrendingToday(),
-                'streak' => $stats->currentStreak(),       // 0 = no streak
-                'previous_rank' => $stats->previousRank(),        // null = new entry
-                'rank_movement_label' => $stats->rankMovementLabel(),   // "Up from #3"
-                'chart' => $stats->votingHistoryInDays(),
-            ],
+            'stats' => $stats,
         ]);
     }
 

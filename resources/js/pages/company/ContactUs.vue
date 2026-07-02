@@ -36,11 +36,11 @@ const appName = computed(() => page.props.name);
                     </h2>
 
                     <p class="mt-2 text-muted-foreground">
-                        hello@foodrank.in
+                        abhiburk@gmail.com
                     </p>
                 </div>
 
-                <div class="rounded-3xl border border-border bg-card p-6">
+                <!-- <div class="rounded-3xl border border-border bg-card p-6">
                     <h2 class="font-semibold">
                         Restaurant Owners
                     </h2>
@@ -48,7 +48,7 @@ const appName = computed(() => page.props.name);
                     <p class="mt-2 text-muted-foreground">
                         partners@foodrank.in
                     </p>
-                </div>
+                </div> -->
 
             </div>
 

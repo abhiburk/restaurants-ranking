@@ -1,5 +1,5 @@
 <script setup>
-import { Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { Deferred, Form, Head, Link, usePage } from '@inertiajs/vue3';
 import {
     CheckCircleIcon,
     EyeIcon,
@@ -38,6 +38,7 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle }
 import RestaurantAvatar from '@/components/restaurant/RestaurantAvatar.vue';
 import { usePermissions } from '@/composables/usePermissions';
 import { permissions } from '@/constants/permissions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 defineProps({
     restaurant: Object,
@@ -121,25 +122,10 @@ const getUserLocation = () => {
     <Head title="Welcome"> </Head>
     <AppLayout>
         <div class="mx-auto w-full space-y-5">
-            <RestaurantBanner :restaurant="restaurant" />
-
-            <!-- KMs Card -->
-            <!-- <div class="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
-                <div class="flex items-center gap-3">
-                    <EyeIcon class="h-5 w-5 text-primary" />
-
-                    <p class="text-sm">
-                        <span class="font-semibold">
-                            {{ restaurant.views+1 }}
-                        </span>
-                        people viewed this restaurant
-                    </p>
-                </div>
-
-                <div class="rounded-full bg-secondary px-3 py-1 text-xs">
-                    Eligible to vote
-                </div>
-            </div> -->
+            <!-- Banner -->
+            <section>
+                <RestaurantBanner :restaurant="restaurant" />
+            </section>
 
             <!-- Voting Card -->
             <section v-if="!voted">
@@ -311,7 +297,7 @@ const getUserLocation = () => {
                             <p class="text-xs uppercase tracking-[0.14em] truncate">
                                 Current Rank
                             </p>
-                            <h2 class="text-6xl font-bold tracking-tight leading-none">#{{ stats?.rank }}</h2>
+                            <h2 class="text-6xl font-bold tracking-tight leading-none">#{{ stats?.rank || '—' }}</h2>
                             <p class="text-sm">
                                 All time <strong>#{{ stats?.all_time.best_rank || '—' }}</strong>
                             </p>
@@ -332,7 +318,7 @@ const getUserLocation = () => {
                                 <span class="flex items-center gap-1">
                                     <span v-if="stats?.rank_change > 0">↑</span>
                                     <span v-else-if="stats?.rank_change < 0">↓</span>
-                                    {{ stats?.rank_movement_label }}
+                                    {{ stats?.rank_movement_label || '—' }}
                                 </span>
                             </h2>
                             <p class="text-sm">
@@ -466,39 +452,58 @@ const getUserLocation = () => {
                 </section>
 
                 <!-- Last 7 Days Chart -->
-                <RestaurantVoteHistoryChart v-if="stats?.chart" :data="stats.chart" />
+                <section>
+                    <Deferred data="stats">
+                        <template #fallback>
+                            <div class="flex flex-wrap gap-2">
+                                <Skeleton class="w-full h-80" />
+                            </div>
+                        </template>
+                        <RestaurantVoteHistoryChart v-if="stats?.chart" :data="stats.chart" />
+                    </Deferred>
+                </section>
             </div>
         </div>
 
         <template #sidebar>
-            <!-- RECENTLY ADDED RESTAURANTS -->
-            <Card v-if="nearbyRestaurants.length" class="bg-transparent shadow-none border-0 p-0 gap-2">
-                <CardHeader class="p-0">
-                    <CardTitle class="text-xs tracking-widest font-medium text-muted-foreground uppercase">
-                        Also Nearby Restaurants
-                    </CardTitle>
-                </CardHeader>
-                <CardContent class="flex  flex-col gap-2 p-0">
-                    <Item v-for="restaurant in nearbyRestaurants" :key="restaurant.id" variant="outline" size="sm"
-                        as-child class="rounded-2xl bg-card text-card-foreground">
-                        <Link :href="RestaurantController.show([restaurant.city.slug, restaurant.slug])">
-                            <ItemMedia>
-                                <RestaurantAvatar :restaurant="restaurant" />
-                            </ItemMedia>
-                            <ItemContent>
-                                <ItemTitle class="line-clamp-1">{{ restaurant.name }}</ItemTitle>
-                                <ItemDescription class="line-clamp-1 text-xs">
-                                    {{ restaurant.city.name }} &sdot; {{ restaurant.address }}
-                                </ItemDescription>
-                            </ItemContent>
-                            <ItemActions>
-                                <!-- Distance in KMs -->
-                                <small>{{ restaurant.distance.toFixed(0) }} Km</small>
-                            </ItemActions>
-                        </Link>
-                    </Item>
-                </CardContent>
-            </Card>
+            <!-- Nearby Restaurants -->
+            <Deferred data="nearbyRestaurants">
+                <template #fallback>
+                    <Skeleton class="w-50 h-4" />
+                    <div class="flex flex-wrap gap-2">
+                        <Skeleton v-for="i in 2" class="w-full h-16" />
+                    </div>
+                </template>
+                <Card v-if="nearbyRestaurants.length" class="bg-transparent shadow-none border-0 p-0 gap-2">
+                    <CardHeader class="p-0">
+                        <CardTitle class="text-xs tracking-widest font-medium text-muted-foreground uppercase">
+                            Also Nearby Restaurants
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="flex  flex-col gap-2 p-0">
+                        <Item v-for="restaurant in nearbyRestaurants" :key="restaurant.id" variant="outline" size="sm"
+                            as-child class="rounded-2xl bg-card text-card-foreground">
+                            <Link :href="RestaurantController.show([restaurant.city.slug, restaurant.slug])">
+                                <ItemMedia>
+                                    <RestaurantAvatar :restaurant="restaurant" />
+                                </ItemMedia>
+                                <ItemContent>
+                                    <ItemTitle class="line-clamp-1">{{ restaurant.name }}</ItemTitle>
+                                    <ItemDescription class="line-clamp-1 text-xs">
+                                        {{ restaurant.city.name }} &sdot; {{ restaurant.address }}
+                                    </ItemDescription>
+                                </ItemContent>
+                                <ItemActions>
+                                    <!-- Distance in KMs -->
+                                    <small>{{ restaurant.distance.toFixed(0) }} Km</small>
+                                </ItemActions>
+                            </Link>
+                        </Item>
+                    </CardContent>
+                </Card>
+            </Deferred>
+
+            <!-- Map -->
             <Card class="overflow-hidden pt-0" v-if="restaurant.latitude && restaurant.longitude">
                 <iframe width="100%" loading="lazy" class="block h-48"
                     :src="`https://maps.google.com/maps?width=100%&height=600&hl=en&q=${restaurant.latitude},${restaurant.longitude}&ie=UTF8&t=&z=14&iwloc=B&output=embed`"></iframe>
@@ -509,7 +514,8 @@ const getUserLocation = () => {
                                 {{ restaurant.address }}
                             </p>
                         </div>
-                        <a :href="`https://www.google.com/maps?q=${restaurant.latitude},${restaurant.longitude}`" target="_blank">
+                        <a :href="`https://www.google.com/maps?q=${restaurant.latitude},${restaurant.longitude}`"
+                            target="_blank">
                             <Button size="sm">
                                 Get Directions
                             </Button>
@@ -517,11 +523,13 @@ const getUserLocation = () => {
                     </div>
                 </CardContent>
             </Card>
+
+            <!-- Claim Restaurant -->
             <section v-if="!restaurant.user_id && can(permissions.create_restaurant_claims)">
                 <Card>
                     <CardHeader>
                         <CardTitle class="flex items-center gap-2">
-                            <Flag class="h-4 w-4" /> Claim Restaurant 
+                            <Flag class="h-4 w-4" /> Claim Restaurant
                         </CardTitle>
                         <CardDescription>
                             Claiming is quick and easy. We verify ownership to ensure only legitimate
@@ -536,7 +544,7 @@ const getUserLocation = () => {
                 </Card>
             </section>
 
-            <!-- Share -->
+            <!-- Share Restaurant -->
             <section>
                 <RestaurantShare :restaurant="restaurant" />
             </section>

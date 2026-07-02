@@ -4,6 +4,8 @@
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&amp;display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@700&amp;display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -12,6 +14,9 @@
         Instrument Sans, ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+
+    --font-comfortaa: "Comfortaa", sans-serif;
+    --font-figtree: "Figtree", sans-serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);

@@ -1,35 +1,18 @@
 <script setup>
-import { Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { Deferred, Head, usePage } from '@inertiajs/vue3';
 import RestaurantController from '@/actions/App/Http/Controllers/Restaurant/RestaurantController';
-import { ArrowUpRightIcon, SearchIcon } from 'lucide-vue-next';
 import RestaurantItems from '@/components/restaurant/RestaurantItems.vue';
-import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import InputError from '@/components/InputError.vue';
-import { Spinner } from '@/components/ui/spinner';
 import CityBanner from '@/components/city/CityBanner.vue';
-import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import SearchInput from '@/components/SearchInput.vue';
 import { computed } from 'vue';
-import Pagination from '@/components/table/Pagination.vue';
 import CityController from '@/actions/App/Http/Controllers/CityController';
-import TodaysGrowthPercentage from '@/components/custom/TodaysGrowthPercentage.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import CitiesPills from '@/components/city/CitiesPills.vue';
+import FilterPills from '@/components/restaurant/FilterPills.vue';
+import { Skeleton } from '@/components/ui/skeleton';
 
 defineProps({
-    restaurants: Array,
+    restaurants: Object,
     city: Object,
     restaurantCategories: Array,
     allTimeVotesToday: String,
@@ -42,42 +25,31 @@ const filters = computed(() => page.props.filters);
 </script>
 
 <template>
-    <Head :title="`Top Restaurants in ${city.name}`" />
+
+    <Head :title="`Top Restaurants in ${city?.name}`" />
     <AppLayout>
-        <div>
-            <CityBanner :city="city" :allTimeVotesToday="allTimeVotesToday" :waitlistCount="waitlistCount" />
+        <div class="fade-3 grid gap-4">
+            <Deferred :data="['allTimeVotesToday', 'waitlistCount']">
+                <template #fallback>
+                    <div class="flex flex-wrap gap-1">
+                        <Skeleton class="w-full h-70 " />
+                    </div>
+                </template>
+                <CityBanner :city="city" :allTimeVotesToday="allTimeVotesToday" :waitlistCount="waitlistCount" />
+            </Deferred>
 
             <!-- Restaurants Section -->
-            <div v-if="city.is_live">
-                <div class="fade-3 my-4 flex flex-wrap gap-2">
-                    <Link :href="RestaurantController.index(city.slug)" preserve-state
-                        :class="filters.category ?? 'bg-primary replace text-primary-foreground'"
-                        class="rounded-full border px-4 py-1.5 text-sm font-medium bg-card text-card-foreground">
-                        All
-                    </Link>
-                    <Link :href="RestaurantController.index(city.slug)" :data="{ category: category.slug }"
-                        preserve-state :class="filters.category === category.slug
-                            ? 'replace bg-primary text-primary-foreground'
-                            : 'bg-card text-card-foreground'
-                            "
-                        class="rounded-full border  px-4 py-1.5 text-sm font-medium transition-colors"
-                        v-for="category in restaurantCategories" :key="category.id">
-                        {{ category.name }}
-                    </Link>
-                </div>
+            <div v-if="city?.is_live" class="fade-4 space-y-4">
+                <FilterPills :items="restaurantCategories" :selected="filters.category"
+                    :href="RestaurantController.index(city.slug)" :only="['restaurants', 'filters']" />
 
                 <!-- Search -->
-                <div class="my-6">
+                <div>
                     <SearchInput :route="RestaurantController.index(city.slug).url" v-model="filters.search"
-                            :extra-params="{ ...filters }" class="w-full text-sm outline-none "
-                            placeholder="Search restaurants" />
+                        :extra-params="{ ...filters }" class="w-full text-sm outline-none "
+                        placeholder="Search restaurants" :options="{ only: ['restaurants', 'filters'] }" />
                 </div>
-
-                <div class="fade-4 space-y-2.5">
-                    <RestaurantItems :restaurants="restaurants" :citySlug="city.slug" />
-
-                    <Pagination :links="restaurants.links" />
-                </div>
+                <RestaurantItems :restaurants="restaurants" />
             </div>
         </div>
         <template #sidebar>

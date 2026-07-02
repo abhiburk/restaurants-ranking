@@ -22,8 +22,11 @@ defineProps({
         </template>
         <Card v-if="recentlyAddedRestaurants?.length" class="bg-transparent shadow-none border-0 p-0 gap-2">
             <CardHeader class="p-0">
-                <CardTitle class="text-xs tracking-widest font-medium text-muted-foreground uppercase">
+                <CardTitle class="text-xs tracking-widest font-medium text-muted-foreground uppercase flex items-center justify-between">
                     New Restaurants
+                    <!-- <Link :href="DiscoverController.explore()" class="flex hover:underline">
+                        View All
+                    </Link> -->
                 </CardTitle>
             </CardHeader>
             <CardContent class="flex flex-col gap-2 p-0">

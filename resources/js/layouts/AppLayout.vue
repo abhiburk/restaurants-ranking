@@ -12,7 +12,8 @@ type Props = {
 
 withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
-    sidebar: () => true
+    sidebar: () => true,
+    fullMain: () => false,
 });
 </script>
 
@@ -20,9 +21,9 @@ withDefaults(defineProps<Props>(), {
     <AppLayout :breadcrumbs="breadcrumbs">
 
         <!-- Full Width Hero -->
-         <!-- <div class="mx-auto flex w-full flex-col px-4 py-4 md:max-w-6xl">
+         <div class="mx-auto flex w-full flex-col px-4 py-4 md:max-w-6xl" v-if="fullMain">
              <slot name="hero" />
-         </div> -->
+         </div>
         <!-- min-h-screen -->
         <div class="mx-auto flex  w-full flex-col px-4 py-4 md:max-w-6xl xl:flex-row">
             <!-- Main Content -->

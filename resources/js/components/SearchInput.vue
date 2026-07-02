@@ -17,7 +17,10 @@ const props = withDefaults(
         paramName?: string;
         extraParams?: SearchParams;
         debounceMs?: number;
-        class?: string
+        class?: string,
+        options?: {
+            only?: string[];
+        };
     }>(),
     {
         placeholder: 'Search...',
@@ -48,6 +51,7 @@ const performSearch = debounce((val: string) => {
             preserveState: true,
             replace: true,
             preserveScroll: true,
+            only: props.options?.only
         },
     );
 }, props.debounceMs);
@@ -64,7 +68,7 @@ watch(value, (val) => {
         <InputGroupAddon>
             <SearchIcon />
         </InputGroupAddon>
-        <InputGroupAddon align="inline-end">
+        <InputGroupAddon align="inline-end" v-if="value">
             <CircleX v-on:click="() => value = ''" class="cursor-pointer" />
         </InputGroupAddon>
     </InputGroup>

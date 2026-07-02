@@ -25,6 +25,6 @@ class RestaurantCategory extends Model
 
     public function restaurants()
     {
-        return $this->hasMany(Restaurant::class, 'restaurant_category_id');
+        return $this->hasMany(Restaurant::class, 'category_id');
     }
 }
