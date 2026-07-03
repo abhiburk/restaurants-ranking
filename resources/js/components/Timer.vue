@@ -1,24 +1,24 @@
 <template>
-    <div class="countdown-timer">
-        <p class="leading-none font-semibold tabular-nums" :class="class">
-            <div class="time-remaining">
-                <span class="hours">{{ formattedTime.hours }}</span> : 
-                <span class="minutes">{{ formattedTime.minutes }}</span>:
-                <span class="seconds">{{ formattedTime.seconds }}</span>
-            </div>
-        </p>
-        <!-- <p class="mt-0.5 text-xs text-gray-500">
-            resets at midnight
-        </p> -->
-    </div>
+    <NumberFlowGroup>
+        <div :class="class">
+            <NumberFlow :trend="-1" :value="formattedTime.hours" :format="{ minimumIntegerDigits: 2 }" />
+            <NumberFlow prefix=":" :trend="-1" :value="formattedTime.minutes" :digits="{ 1: { max: 5 } }"
+                :format="{ minimumIntegerDigits: 2 }" />
+            <NumberFlow prefix=":" :trend="-1" :value="formattedTime.seconds" :digits="{ 1: { max: 5 } }"
+                :format="{ minimumIntegerDigits: 2 }" />
+        </div>
+    </NumberFlowGroup>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import moment from 'moment';
-
+import NumberFlow, { NumberFlowGroup } from '@number-flow/vue'
 defineProps({
-    class: String
+    class: {
+        type: String,
+        default: 'leading-none font-semibold tabular-nums text-foreground'
+    }
 });
 
 // Reactive state

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Deferred, Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { computed } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,45 @@ import UndrawAgreement from '@/components/svg/UndrawAgreement.vue';
 import UndrawAddPost from '@/components/svg/UndrawAddPost.vue';
 import UndrawApprove from '@/components/svg/UndrawApprove.vue';
 import ContributorController from '@/actions/App/Http/Controllers/ContributorController';
+import { Skeleton } from '@/components/ui/skeleton';
+import NumberFlow from '@number-flow/vue'
 
 const page = usePage();
 const appName = computed(() => page.props.name);
+
+const props = defineProps({
+    totalRestaurants: {
+        type: Number,
+        default: 0
+    },
+    totalContributors: {
+        type: Number,
+        default: 0
+    },
+    totalCities: {
+        type: Number,
+        default: 0
+    },
+    topThreeContributors: {
+        type: Array,
+        default: () => []
+    }
+});
+
+const displayOrder = computed(() => {
+    const sorted = [...props.topThreeContributors].sort((a, b) => b.restaurants_submissions_count - a.restaurants_submissions_count);
+    return [sorted[1], sorted[0], sorted[2]];
+});
+
+const medalIcon = (index) => {
+    const medals = ['🥈', '🥇', '🥉'];
+    return medals[index] || '🏅';
+};
+
+const rankLabel = (index) => {
+    const ranks = ['#2', '#1', '#3'];
+    return ranks[index] || '#—';
+};
 </script>
 
 <template>
@@ -85,25 +121,46 @@ const appName = computed(() => page.props.name);
                 <div class="overflow-hidden rounded-3xl border border-secondary bg-secondary">
                     <div class="grid grid-cols-3 divide-x divide-primary/10">
                         <div class="p-5 text-center">
-                            <div class="text-3xl font-bold tracking-tight">
-                                312
-                            </div>
+                            <p class=" sm:text-3xl text-2xl font-semibold text-foreground">
+                                <div class="flex items-center justify-center">
+                                    <Deferred data="totalRestaurants">
+                                        <template #fallback>
+                                            <Skeleton class="w-8 h-9 rounded-md" />
+                                        </template>
+                                        <NumberFlow :format="{ notation: 'compact' }" :value="totalRestaurants" />
+                                    </Deferred>
+                                </div>
+                            </p>
                             <p class="text-sm text-muted-foreground">
                                 restaurants added
                             </p>
                         </div>
                         <div class="p-5 text-center">
-                            <div class="text-3xl font-bold tracking-tight">
-                                24
-                            </div>
+                            <p class=" sm:text-3xl text-2xl font-semibold text-foreground">
+                                <div class="flex items-center justify-center">
+                                    <Deferred data="totalContributors">
+                                        <template #fallback>
+                                            <Skeleton class="w-8 h-9 rounded-md" />
+                                        </template>
+                                        <NumberFlow :format="{ notation: 'compact' }" :value="totalContributors" />
+                                    </Deferred>
+                                </div>
+                            </p>
                             <p class="text-sm text-muted-foreground">
                                 contributors
                             </p>
                         </div>
                         <div class="p-5 text-center">
-                            <div class="text-3xl font-bold tracking-tight">
-                                6
-                            </div>
+                            <p class=" sm:text-3xl text-2xl font-semibold text-foreground">
+                                <div class="flex items-center justify-center">
+                                    <Deferred data="totalCities">
+                                        <template #fallback>
+                                            <Skeleton class="w-8 h-9 rounded-md" />
+                                        </template>
+                                        <NumberFlow :format="{ notation: 'compact' }" :value="totalCities" />
+                                    </Deferred>
+                                </div>
+                            </p>
                             <p class="text-sm text-muted-foreground">
                                 cities covered
                             </p>
@@ -119,7 +176,7 @@ const appName = computed(() => page.props.name);
                         ⚡ Simple & Transparent
                     </Badge>
                     <h2 class="text-4xl font-bold tracking-tight">
-                        How {{ appName}} Contributors Work
+                        How {{ appName }} Contributors Work
                     </h2>
                     <p class="mx-auto max-w-2xl text-lg text-muted-foreground">
                         Help discover great restaurants in your city in just a few simple steps.
@@ -256,86 +313,44 @@ const appName = computed(() => page.props.name);
                         Recognizing community members helping discover great restaurants.
                     </p>
                 </div>
+                
                 <div class="mt-12 grid gap-5 md:grid-cols-3">
-                    <!-- #2 -->
-                    <Card class="md:mt-8 flex flex-col justify-center">
+                    <Card v-for="(contributor, index) in displayOrder" :key="contributor?.id"
+                        class="flex flex-col justify-center transition-all duration-300 hover:shadow-lg" :class="{
+                            'md:mt-8': index === 0 || index === 2,
+                            'bg-secondary text-secondary-foreground scale-105 shadow-xl': index === 1,
+                            'hover:scale-105': index !== 1,
+                        }">
                         <CardContent>
-                            <div class="text-center space-y-4 ">
-                                <div
-                                    class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-2xl">
-                                    🥈
-                                </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold">
-                                        Priya Sharma
-                                    </h3>
-                                    <p class="text-sm text-muted-foreground">
-                                        Mumbai
-                                    </p>
-                                </div>
-                                <div class="rounded-2xl bg-secondary p-4">
-                                    <div class="text-3xl font-bold">
-                                        41
-                                    </div>
-                                    <div class="text-sm text-muted-foreground">
-                                        Restaurants Added
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            <div class="text-center space-y-4">
+                                <!-- Rank Badge -->
+                                <!-- <div class="text-xs font-medium text-muted-foreground">
+                                    {{ rankLabel(index) }}
+                                </div> -->
 
-                    <!--  -->
-                    <Card class="flex flex-col justify-center bg-secondary text-secondary-foreground">
-                        <CardContent>
-                            <div class="text-center space-y-4 ">
-                                <div
-                                    class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground text-2xl">
-                                    🥇
+                                <!-- Medal -->
+                                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl"
+                                    :class="{
+                                        'bg-primary text-primary-foreground': index === 1,
+                                        'bg-secondary text-secondary-foreground': index !== 1,
+                                    }">
+                                    {{ medalIcon(index) }}
                                 </div>
-                                <div>
-                                    <h3 class="text-xl font-semibold">
-                                        Abhishek
-                                    </h3>
-                                    <p class="text-sm text-muted-foreground">
-                                        Chhatrapati Sambhajinagar
-                                    </p>
-                                </div>
-                                <div class="rounded-2xl bg-white text-white-foreground p-4">
-                                    <div class="text-3xl font-bold">
-                                        57
-                                    </div>
-                                    <div class="text-sm text-muted-foreground">
-                                        Restaurants Added
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
 
-                    <!-- #3 -->
-                    <Card class="md:mt-8 flex flex-col justify-center">
-                        <CardContent>
-                            <div class="text-center space-y-4 ">
-                                <div
-                                    class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-secondary-foreground text-2xl">
-                                    🥉
-                                </div>
+                                <!-- Name & City -->
                                 <div>
-                                    <h3 class="text-xl font-semibold">
-                                        Rahul Patil
-                                    </h3>
-                                    <p class="text-sm text-muted-foreground">
-                                        Pune
-                                    </p>
+                                    <h3 class="text-xl font-semibold">{{ contributor?.user.name }}</h3>
+                                    <p class="text-sm text-muted-foreground">{{ contributor?.city.name }}</p>
                                 </div>
-                                <div class="rounded-2xl bg-secondary p-4">
-                                    <div class="text-3xl font-bold">
-                                        32
+
+                                <!-- Stats -->
+                                <div class="rounded-2xl p-4" :class="{
+                                    'bg-white text-foreground': index === 1,
+                                    'bg-secondary': index !== 1,
+                                }">
+                                    <div class="text-3xl font-bold">{{ contributor?.restaurants_submissions_count }}
                                     </div>
-                                    <div class="text-sm text-muted-foreground">
-                                        Restaurants Added
-                                    </div>
+                                    <div class="text-sm text-muted-foreground">Restaurants Added</div>
                                 </div>
                             </div>
                         </CardContent>
@@ -361,8 +376,8 @@ const appName = computed(() => page.props.name);
                         </p>
                     </CardContent>
                     <CardFooter>
-                        <Button size="lg" variant="secondary">
-                            Become a Contributor
+                        <Button size="lg" as-child variant="secondary">
+                            <Link :href="ContributorController.create()">Join the community</Link>
                         </Button>
                     </CardFooter>
                 </Card>

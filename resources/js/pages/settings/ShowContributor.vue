@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Form, Head } from '@inertiajs/vue3';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
@@ -35,6 +35,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import ContributorController from '@/actions/App/Http/Controllers/ContributorController';
+import CardTitle from '@/components/ui/card/CardTitle.vue';
 
 const props = defineProps({
     contributor: Object,
@@ -129,7 +130,7 @@ const colorClasses = {
 
         <SettingsLayout>
             <div class="flex flex-col gap-4">
-                <Item variant="outline" class="bg-card">
+                <Item variant="outline" class="bg-card rounded-2xl">
                     <ItemMedia>
                         <Avatar class="size-10">
                             <AvatarImage :src="contributor.city.logo" />
@@ -273,41 +274,46 @@ const colorClasses = {
                 </Card>
 
                 <!-- Activity Log -->
-                <div class="bg-card border border-border rounded-xl p-5">
-                    <p class="text-sm font-medium text-foreground m-0 mb-4">Recent activity</p>
-
-                    <div class="flex flex-col divide-y divide-border">
-                        <div v-if="!contributor.contributor_logs.length">
-                            <p class="text-sm text-muted-foreground m-0">No activity yet</p>
-                        </div>
-                        <div v-for="log in contributor.contributor_logs" :key="log.id"
-                            class="flex items-center gap-3 py-2.5">
-                            <!-- Icon -->
-                            <div
-                                :class="['w-8 h-8 rounded-lg flex items-center justify-center shrink-0', colorClasses[actionMap[log.action].color].bg]">
-                                <ContributorLogIcon :icon="actionMap[log.action].icon"
-                                    :class="['w-4 h-4', colorClasses[actionMap[log.action].color].icon]" />
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            Recent activity
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="flex flex-col divide-y divide-border">
+                            <div v-if="!contributor.contributor_logs.length">
+                                <p class="text-sm text-muted-foreground m-0">No activity yet</p>
                             </div>
+                            <div v-for="log in contributor.contributor_logs" :key="log.id"
+                                class="flex items-center gap-3 py-2.5">
+                                <!-- Icon -->
+                                <div
+                                    :class="['w-8 h-8 rounded-lg flex items-center justify-center shrink-0', colorClasses[actionMap[log.action].color].bg]">
+                                    <ContributorLogIcon :icon="actionMap[log.action].icon"
+                                        :class="['w-4 h-4', colorClasses[actionMap[log.action].color].icon]" />
+                                </div>
 
-                            <!-- Label + subtitle -->
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm text-foreground m-0">
-                                    {{ actionMap[log.action].label }}
-                                </p>
-                                <p class="text-xs text-muted-foreground m-0 mt-0.5">
-                                    <template v-if="log.loggable">{{ log.loggable.name }} · </template>
-                                    <template v-if="log.note">{{ log.note }} · </template>
-                                    {{ moment(log.created_at).fromNow() }}
-                                </p>
+                                <!-- Label + subtitle -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-foreground m-0">
+                                        {{ actionMap[log.action].label }}
+                                    </p>
+                                    <p class="text-xs text-muted-foreground m-0 mt-0.5">
+                                        <template v-if="log.loggable">{{ log.loggable.name }} · </template>
+                                        <template v-if="log.note">{{ log.note }} · </template>
+                                        {{ moment(log.created_at).fromNow() }}
+                                    </p>
+                                </div>
+
+                                <!-- Points -->
+                                <span :class="['text-sm font-medium', colorClasses[actionMap[log.action].color].pts]">
+                                    {{ log.points > 0 ? `+${log.points}` : log.points }}
+                                </span>
                             </div>
-
-                            <!-- Points -->
-                            <span :class="['text-sm font-medium', colorClasses[actionMap[log.action].color].pts]">
-                                {{ log.points > 0 ? `+${log.points}` : log.points }}
-                            </span>
                         </div>
-                    </div>
-                </div>
+                    </CardContent>
+                </Card>
 
                 <!-- Leave -->
                 <AlertDialog>

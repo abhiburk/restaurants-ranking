@@ -4,82 +4,41 @@ import CitiesPills from '@/components/city/CitiesPills.vue';
 import CityItem from '@/components/city/CityItem.vue';
 import RestaurantBanner from '@/components/restaurant/RestaurantBanner.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Deferred, Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { Deferred, Form, Head, Link, usePage, usePoll } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { Skeleton } from '@/components/ui/skeleton';
 import NewRestaurantItems from '@/components/restaurant/NewRestaurantItems.vue';
 import { Card, CardContent } from '@/components/ui/card';
-import RestaurantController from '@/actions/App/Http/Controllers/Restaurant/RestaurantController';
-import DiscoverController from '@/actions/App/Http/Controllers/DiscoverController';
-import { Button } from '@/components/ui/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Search } from 'lucide-vue-next';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import NumberFlow from '@number-flow/vue'
 
 const page = usePage();
 const appName = computed(() => page.props.name);
 defineProps({
     totalActiveCities: Number,
     totalActiveRestaurants: Number,
-    totalVotesToday: Number,
+    totalVotesToday: {
+        type: Number,
+        default: 0
+    },
     activeCities: Array,
     comingSoonCities: Array,
     mostActiveRestaurant: Object,
     recentlyAddedRestaurants: Array
 });
+
+usePoll(1000 * 10, {
+    onStart() { console.log('Total Votes Today Polling started') },
+    onFinish() { console.log('Total Votes Today Polling finished') },
+    onError(errors) { console.error(errors) },
+    only: ['totalVotesToday']
+})
 </script>
 
 <template>
 
     <Head :title="`Discover · ${appName}`" />
 
-    <AppLayout fullMain>
-        <template #hero>
-            <Card class="relative overflow-hidden">
-                <CardContent class="py-4">
-                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1600"
-                        class="absolute inset-0 h-full w-full object-cover opacity-40" />
-
-                    <!-- Gradient: Minimal Glass -->
-                    <div class="absolute inset-0 bg-primary/50 backdrop-blur-xs" />
-
-                    <div class="relative space-y-6">
-                        <Badge
-                            class="px-3 py-1 text-xs font-medium tracking-widest uppercase bg-white/20 text-primary-foreground border-white/20 backdrop-blur-sm">
-                            Community Powered
-                        </Badge>
-                        <h1 class="max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl text-primary-foreground">
-                            Discover the city's finest,
-                            <span class="text-secondary-foreground">
-                                ranked by the people
-                            </span>
-                            who eat there.
-                        </h1>
-                        <p class="max-w-2xl text-lg leading-relaxed text-primary-foreground/50">
-                            Discover authentic restaurants, explore hidden gems,
-                            and help your local favourites climb the rankings.
-                        </p>
-                        <div class="max-w-xl">
-                            <Form action="/explore" method="GET">
-                                <InputGroup
-                                    class="p-2 py-6 border-0 focus-within:ring-0! rounded-2xl bg-card! text-card-foreground">
-                                    <InputGroupInput class="border-0 hover:border-0" placeholder="Explore restaurants in your city" name="search" autocomplete="off" />
-                                    <InputGroupAddon>
-                                        <Search />
-                                    </InputGroupAddon>
-                                    <InputGroupAddon align="inline-end">
-                                        <Button type="submit">
-                                            Search
-                                        </Button>
-                                    </InputGroupAddon>
-                                </InputGroup>
-                            </Form>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </template>
+    <AppLayout>
         <div class="grid gap-6">
             <!-- STATS -->
             <section>
@@ -120,7 +79,7 @@ defineProps({
                                     <template #fallback>
                                         <Skeleton class="w-8 h-9 rounded-md" />
                                     </template>
-                                    {{ totalVotesToday.toLocaleString() }}
+                                    <NumberFlow :format="{ notation: 'compact' }" :value="totalVotesToday" />
                                 </Deferred>
                             </div>
                             </p>

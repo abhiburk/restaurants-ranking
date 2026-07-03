@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\Contributor;
 use App\Models\Restaurant;
 use App\Models\Vote;
 use App\Services\CityService;
@@ -32,7 +33,7 @@ class DiscoverController extends Controller
 
         $totalVotesToday = Inertia::defer(
             fn() =>
-            cache()->remember('stats.votes-today', 60, fn() => Number::abbreviate(Vote::whereBetween('voted_at', [$todayStart, $todayEnd])->count())),
+            cache()->remember('stats.votes-today', 60, fn() => Vote::today()->count()),
             'stats'
         );
 
@@ -80,7 +81,13 @@ class DiscoverController extends Controller
 
     public function home()
     {
-        return inertia('Home');
+        $totalVotesToday = Inertia::defer(function () {
+            $totalVotesToday = Vote::today()->count();
+            return cache()->remember('stats.votes-today', 60, fn() => $totalVotesToday);
+        });
+        return inertia('Home', [
+            'totalVotesToday' => $totalVotesToday
+        ]);
     }
 
     public function howItWorks()
@@ -115,7 +122,29 @@ class DiscoverController extends Controller
 
     public function community()
     {
-        return inertia('company/Community');
+        $totalRestaurants = Inertia::defer(fn() => Restaurant::active()->count(), 'stats');
+        $totalContributors = Inertia::defer(fn() => Contributor::count(), 'stats');
+        $totalCities = Inertia::defer(fn() => City::active()->count(), 'stats');
+
+        $topThreeContributors = Inertia::defer(
+            fn() =>
+            Contributor::with('user:id,name,email')
+                // ->select('id', 'user_id', 'city_id')
+                ->with('city:id,name')
+                ->withCount('restaurants_submissions')
+                ->orderByDesc('restaurants_submissions_count')
+                ->groupBy('id')
+                ->limit(3)
+                ->get(),
+            'top-contributors'
+        );
+
+        return inertia('company/Community', [
+            'totalRestaurants' => $totalRestaurants,
+            'totalContributors' => $totalContributors,
+            'totalCities' => $totalCities,
+            'topThreeContributors' => $topThreeContributors
+        ]);
     }
 
     public function explore(Request $request)
