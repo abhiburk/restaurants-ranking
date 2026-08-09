@@ -2,8 +2,11 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Restaurant;
 use App\Models\Vote;
 use App\Models\VoteArchive;
+use App\Services\PulseService;
+use App\Services\RestaurantStatsService;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -62,10 +65,10 @@ class ResetDailyVotesCommand extends Command
             DB::raw('MIN(created_at) as first_vote_at'),
             DB::raw('MAX(created_at) as last_vote_at')
         )
-        ->where('voted_at', $date)
-        ->groupBy('restaurant_id')
-        ->orderByDesc('total_votes')
-        ->get();
+            ->where('voted_at', $date)
+            ->groupBy('restaurant_id')
+            ->orderByDesc('total_votes')
+            ->get();
 
         if ($votes->isEmpty()) {
             $this->warn("No votes found for {$date}");
@@ -114,6 +117,49 @@ class ResetDailyVotesCommand extends Command
         });
 
         VoteArchive::insert($rows->toArray());
+
+        // After VoteArchive::insert() in archiveDate()
+        $pulse = app(PulseService::class);
+
+        // Daily winner event — top restaurant per city
+        $winners = $rows->groupBy('city_id')->map(function ($cityRows) {
+            return $cityRows->sortByDesc('votes')->first();
+        });
+
+        foreach ($winners as $winner) {
+            $restaurant = Restaurant::with('city')->find($winner['restaurant_id']);
+            if (! $restaurant) continue;
+
+            $pulse->createEvent(
+                $restaurant->city_id,
+                'daily_winner',
+                [
+                    'restaurant_name' => $restaurant->name,
+                    'total_votes'     => $winner['votes'],
+                    'date'            => $date,
+                    'area'            => $restaurant->area,
+                ],
+                $restaurant->id,
+                pinned: true  // winner events are pinned
+            );
+
+            // Check streak milestone
+            $streak = app(RestaurantStatsService::class, ['restaurant' => $restaurant])->currentStreak();
+
+            if (in_array($streak, PulseService::STREAK_MILESTONES)) {
+                $pulse->createEvent(
+                    $restaurant->city_id,
+                    'streak_milestone',
+                    [
+                        'restaurant_name' => $restaurant->name,
+                        'streak_days'     => $streak,
+                        'area'            => $restaurant->area,
+                    ],
+                    $restaurant->id,
+                    pinned: true
+                );
+            }
+        }
 
         /*
         |--------------------------------------------------------------------------

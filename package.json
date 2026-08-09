@@ -37,7 +37,7 @@
         "@fingerprintjs/fingerprintjs": "^5.1.0",
         "@hiseb/confetti": "^2.1.0",
         "@inertiajs/vue3": "^2.3.7",
-        "@lucide/vue": "^1.21.0",
+        "@lucide/vue": "^1.23.0",
         "@number-flow/vue": "^0.5.1",
         "@tanstack/vue-table": "^8.21.3",
         "@unovis/ts": "^1.6.4",

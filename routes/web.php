@@ -4,6 +4,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ContributorController;
 use App\Http\Controllers\DiscoverController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\Restaurant\RestaurantController;
 use App\Http\Controllers\Restaurant\VoteController;
 use App\Models\Contributor;
@@ -65,10 +66,12 @@ Route::get('/cities', [CityController::class, 'index'])->name('city.index');
 Route::get('/coming-soon-cities', [CityController::class, 'comingSoonCities'])->name('city.coming-soon-cities');
 Route::post('/{city:slug}/wishlist', [CityController::class, 'storeWishlist'])->name('city.wishlist.store');
 
-
+Route::get('/pulse', [FeedController::class, 'index'])->name('cities.pulse');
+Route::get('/{city:slug}/pulse', [FeedController::class, 'index'])->name('cities.pulse');
 Route::get('/{city:slug}/restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
 Route::get('/{city:slug}/{restaurant:slug}', [RestaurantController::class, 'show'])->name('restaurants.show');
 Route::get('/{city:slug}/{restaurant:slug}/photos', [RestaurantController::class, 'photos'])->name('restaurants.photos');
+
 
 // Allow 1 request per 24 hours per IP address
 Route::post('/{city:slug}/{restaurant:slug}/vote', [VoteController::class, 'store'])->name('restaurants.vote')->middleware('throttle:1,1,200');

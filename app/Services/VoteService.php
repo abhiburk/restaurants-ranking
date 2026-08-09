@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\CheckPulseEventsJob;
 use App\Models\Restaurant;
 use App\Models\Vote;
 use Illuminate\Database\QueryException;
@@ -20,8 +21,8 @@ class VoteService
         $userId = $request->user()?->id;
         $ipAddress = $request->ip();
         $votedAt = now();
-        $ipHash = hash('sha256', $ipAddress.$votedAt);
-        $uaHash = hash('sha256', $request->userAgent().$votedAt);
+        $ipHash = hash('sha256', $ipAddress . $votedAt);
+        $uaHash = hash('sha256', $request->userAgent() . $votedAt);
         $voteSource = $request->input('vote_source', 'url');
 
         // ── 1. Hard block: duplicate by logged-in user ─────────────────
@@ -119,6 +120,8 @@ class VoteService
                 'latitude' => $request->input('latitude'),
                 'longitude' => $request->input('longitude'),
             ]);
+
+            CheckPulseEventsJob::dispatch($restaurant->id);
 
             return $this->response('success', 'Vote cast successfully.', [
                 'vote_id' => $vote->id,

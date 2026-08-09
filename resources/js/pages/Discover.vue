@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import NewRestaurantItems from '@/components/restaurant/NewRestaurantItems.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import NumberFlow from '@number-flow/vue'
+import FoodPulse from './FoodPulse.vue';
 
 const page = usePage();
 const appName = computed(() => page.props.name);
@@ -40,6 +41,7 @@ usePoll(1000 * 10, {
 
     <AppLayout>
         <div class="grid gap-6">
+
             <!-- STATS -->
             <section>
                 <Card class="bg-secondary ">
@@ -104,6 +106,8 @@ usePoll(1000 * 10, {
                     <RestaurantBanner :restaurant="mostActiveRestaurant" />
                 </Deferred>
             </section>
+
+            <!-- <FoodPulse /> -->
 
             <!-- POPULAR CITIES -->
             <section>

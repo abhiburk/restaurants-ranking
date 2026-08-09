@@ -10,6 +10,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import CitiesPills from '@/components/city/CitiesPills.vue';
 import FilterPills from '@/components/restaurant/FilterPills.vue';
 import { Skeleton } from '@/components/ui/skeleton';
+import FoodPulse from '../FoodPulse.vue';
 
 defineProps({
     restaurants: Object,
@@ -28,7 +29,10 @@ const filters = computed(() => page.props.filters);
 
     <Head :title="`Top Restaurants in ${city?.name}`" />
     <AppLayout>
+        
         <div class="fade-3 grid gap-4">
+            <!-- <FoodPulse /> -->
+            
             <Deferred :data="['allTimeVotesToday', 'waitlistCount']">
                 <template #fallback>
                     <div class="flex flex-wrap gap-1">
