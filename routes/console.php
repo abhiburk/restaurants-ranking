@@ -13,5 +13,5 @@ Schedule::job(new GenerateCityPulseJob)->hourly()->timezone('Asia/Kolkata');
 Schedule::command('pulse:prune')->dailyAt('03:00')->timezone('Asia/Kolkata');
 
 
-// Schedule::command('php artisan migrate:fresh')->daily();
-// Schedule::command('php artisan votes:reset-daily')->daily();
+Schedule::command('php artisan migrate:fresh')->daily();
+Schedule::command('php artisan votes:reset-daily')->daily();
