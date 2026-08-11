@@ -1,0 +1,1 @@
+import{c as r,s as n,o as a}from"./app-FSux418L.js";const l=(e,t)=>{const s=e.__vccOpts||e;for(const[c,o]of t)s[c]=o;return s},_={},f={class:"flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]"};function i(e,t){return a(),r("div",f,[n(e.$slots,"default")])}const p=l(_,[["render",i]]);export{p as G};
