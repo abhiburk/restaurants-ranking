@@ -4,6 +4,9 @@ import type { BreadcrumbItem } from '@/types';
 import 'vue-sonner/style.css'
 import { Toaster } from 'vue-sonner';
 import Footer from './Footer.vue';
+import TestingStrip from '@/components/TestingStrip.vue';
+
+const isEnvLocal = import.meta.env.VITE_APP_ENV === 'local';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
@@ -18,6 +21,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
+    <TestingStrip v-if="isEnvLocal" />
     <AppLayout :breadcrumbs="breadcrumbs">
 
         <!-- Full Width Hero -->
