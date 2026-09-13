@@ -140,7 +140,6 @@ class RestaurantForm
                     Group::make()
                         ->columnSpan(['default' => 1, 'lg' => 1])
                         ->schema([
-
                             Section::make('')
                                 ->schema([
                                     FileUpload::make('logo')
@@ -184,7 +183,6 @@ class RestaurantForm
                             Section::make('Settings')
                                 ->icon(Heroicon::Cog)
                                 ->schema([
-
                                     Toggle::make('is_active')
                                         ->label('Active')
                                         ->columnSpanFull()

@@ -13,7 +13,7 @@ const build   = props.build   ?? '1042'
 </script>
 
 <template>
-    <div class="w-full bg-primary text-primary-foreground px-4 py-2 flex items-center justify-between gap-4 text-xs font-mono">
+    <div class="w-full bg-card text-card-foreground px-4 py-2 flex items-center justify-between gap-4 text-xs font-mono">
 
         <!-- Left — env badge -->
         <div class="flex items-center gap-2.5 shrink-0">
@@ -23,8 +23,8 @@ const build   = props.build   ?? '1042'
                     {{ env }}
                 </span>
             </span>
-            <span class="text-neutral-600">·</span>
-            <span class="text-neutral-400">{{ version }}</span>
+            <span class="text-muted-foreground">·</span>
+            <span class="text-muted-foreground">{{ version }}</span>
         </div>
 
         <!-- Center — message -->
